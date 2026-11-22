@@ -83,6 +83,8 @@ python -m resume_pipeline --resume examples/resume.md --jd examples/job_descript
 | `--research old_run/01_research_report.md` | Reuse earlier research, for example when applying to a second role at the same company |
 | `--target-score 85` | The recruiter score at which the loop stops |
 | `--max-rounds 3` | The maximum number of writer/recruiter rounds |
+| `--latex` | Also produce `resume_final.tex`, plus `resume_final.pdf` if `pdflatex` is installed |
+| `--paper a4\|letter` | Paper size for the LaTeX output (default `a4`) |
 | `--model` | Override the model |
 
 Output goes to `output/<company>_<role>_<timestamp>/`:
@@ -95,7 +97,38 @@ Output goes to `output/<company>_<role>_<timestamp>/`:
 | `02_skills_brief.json` | Structured skill and gap analysis |
 | `03_resume_vN.md`, `04_review_vN.json` | Every draft and every recruiter review |
 
+With `--latex` you also get `resume_final.tex`, plus `resume_final.pdf` when `pdflatex` is installed.
+
 **Always read `REPORT.md` → "Check these before you send" before you submit.**
+
+## LaTeX output (optional)
+
+There are two ways to get LaTeX code for your resume.
+
+**1. As part of a run.** Add `--latex`:
+
+```bash
+python -m resume_pipeline --resume my_resume.pdf --jd jd.txt --company "Acme" --role "Data Engineer" --latex
+```
+
+**2. From any resume Markdown file**, for example a final resume from an earlier run, or one you edited by hand:
+
+```bash
+python -m resume_pipeline.latex output/<run>/resume_final.md
+```
+
+```bash
+python -m resume_pipeline.latex output/<run>/resume_final.md -o jane_doe.tex --pdf --paper letter
+```
+
+Both write a standalone `.tex` file that compiles with `pdflatex`. You can also upload it to [Overleaf](https://www.overleaf.com) (New Project → Upload Project) and edit it there.
+
+- **Deterministic conversion.** The `.tex` is converted by code, with no extra Claude call, so it always matches the final resume word for word.
+- **Special characters are escaped:** `C#`, `R&D`, `100%`, `$`, `_`, `{}`, accents, smart quotes and dashes.
+- **Links work.** Emails, URLs and `[text](url)` links become clickable.
+- **ATS-friendly PDF.** It uses a single column with no tables or icons. Unicode mapping is on, and "fi"/"fl" ligatures are off, so tracking systems read "Airflow" rather than "Airow".
+- **Easy to restyle.** Change the accent color (`accent`), margins, or the `\resumeentry` macro at the top of the file.
+- **Optional local PDF.** To build PDFs on your machine you need TeX Live. On Debian or Ubuntu that's `texlive-latex-base`, `texlive-latex-recommended`, `texlive-latex-extra` and `lmodern`. On macOS it's MacTeX. Without it you still get the `.tex` file.
 
 ## Tests
 
@@ -116,3 +149,4 @@ The tests run the whole pipeline offline. They use the real Anthropic SDK agains
 | `resume_pipeline/humanize.py` | The AI-tell linter; add phrases to `BUZZWORDS` |
 | `resume_pipeline/llm.py` | SDK wrapper: streaming, `pause_turn` resume, refusal handling, prompt caching |
 | `resume_pipeline/io_utils.py` | PDF/DOCX/URL loading and DOCX rendering |
+| `resume_pipeline/latex.py` | Markdown → LaTeX converter and optional PDF build |

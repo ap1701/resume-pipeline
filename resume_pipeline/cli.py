@@ -26,6 +26,8 @@ def main(argv: list[str] | None = None) -> None:
     ap.add_argument("--research", help="Reuse a saved research report (.md) instead of re-researching")
     ap.add_argument("--target-score", type=int, default=85, help="Stop once the recruiter scores this or higher (default 85)")
     ap.add_argument("--max-rounds", type=int, default=3, help="Max writer/recruiter rounds (default 3)")
+    ap.add_argument("--latex", action="store_true", help="Also produce resume_final.tex (and a PDF if pdflatex is installed)")
+    ap.add_argument("--paper", choices=["a4", "letter"], default="a4", help="Paper size for the LaTeX output (default a4)")
     ap.add_argument("--model", default=DEFAULT_MODEL)
     ap.add_argument("--out", default="output", help="Output directory (default ./output)")
     ap.add_argument("-v", "--verbose", action="store_true")
@@ -41,6 +43,7 @@ def main(argv: list[str] | None = None) -> None:
         out_dir=Path(a.out), target_score=a.target_score, max_rounds=a.max_rounds,
         location=a.location, extra_instructions=a.notes,
         research_report=Path(a.research).read_text() if a.research else None,
+        latex=a.latex, latex_paper=f"{a.paper}paper",
     )
     if len(cfg.resume) < 200:
         sys.exit("Resume text looks empty. If it's a scanned PDF, export it as .docx or .txt first.")
@@ -52,6 +55,8 @@ def main(argv: list[str] | None = None) -> None:
         sys.exit(f"Pipeline stopped: {e}")
     u = llm.usage
     print(f"\nFinal resume: {result.out_dir / 'resume_final.docx'}")
+    if a.latex:
+        print(f"LaTeX:        {result.out_dir / 'resume_final.tex'}")
     print(f"Report:       {result.out_dir / 'REPORT.md'}")
     print(f"API calls: {u.calls}, input tokens: {u.input_tokens:,} (cached {u.cache_read_tokens:,}), output tokens: {u.output_tokens:,}")
 

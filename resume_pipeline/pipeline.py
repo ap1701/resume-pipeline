@@ -13,6 +13,7 @@ from typing import List, Optional
 from .agents import recruiter_agent, research_agent, strategist_agent, writer_agent
 from .humanize import lint
 from .io_utils import markdown_to_docx
+from .latex import write_latex
 from .llm import LLM
 from .models import RecruiterReview, ResearchBrief, TailoredResume
 
@@ -31,6 +32,8 @@ class PipelineConfig:
     location: Optional[str] = None
     extra_instructions: str = ""
     research_report: Optional[str] = None  # reuse a previous run's research
+    latex: bool = False          # also write resume_final.tex (+ PDF if pdflatex is installed)
+    latex_paper: str = "a4paper"  # or "letterpaper"
 
 
 @dataclass
@@ -121,6 +124,9 @@ def run(cfg: PipelineConfig, llm: Optional[LLM] = None) -> PipelineResult:
     result.best = best
     (out / "resume_final.md").write_text(best.draft.resume_markdown)
     markdown_to_docx(best.draft.resume_markdown, out / "resume_final.docx")
+    if cfg.latex:
+        pdf = write_latex(best.draft.resume_markdown, out / "resume_final.tex", paper=cfg.latex_paper, pdf=True)
+        log.info("LaTeX: resume_final.tex%s", " + resume_final.pdf" if pdf else " (no pdflatex found; open it in Overleaf)")
     (out / "REPORT.md").write_text(render_report(cfg, result))
     log.info("Done. Best draft: v%d (score %d). Output: %s", best.n, best.review.overall_score, out)
     return result

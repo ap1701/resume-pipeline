@@ -96,13 +96,15 @@ def make_llm(captured: list) -> LLM:
 def test_end_to_end(tmp_path):
     captured: list = []
     cfg = PipelineConfig(company="Acme", role="Data Engineer", jd=(EX / "job_description.txt").read_text(),
-                         resume=(EX / "resume.md").read_text(), out_dir=tmp_path, max_rounds=3)
+                         resume=(EX / "resume.md").read_text(), out_dir=tmp_path, max_rounds=3,
+                         latex=True)
     res = run(cfg, make_llm(captured))
 
     # loop stopped once the recruiter cleared the draft
     assert [r.review.overall_score for r in res.rounds] == [72, 88]
     assert res.best.n == 2
-    for f in ["01_research_report.md", "02_skills_brief.json", "resume_final.docx", "REPORT.md", "04_review_v1.json"]:
+    for f in ["01_research_report.md", "02_skills_brief.json", "resume_final.docx", "resume_final.tex",
+              "REPORT.md", "04_review_v1.json"]:
         assert (res.out_dir / f).exists(), f
 
     # request shapes
