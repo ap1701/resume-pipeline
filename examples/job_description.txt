@@ -1,0 +1,16 @@
+Senior Data Engineer - Acme Logistics (Bengaluru / Hybrid)
+
+You'll own the data pipelines that power routing, pricing and customer analytics.
+
+What you'll do
+- Design and operate reliable batch and streaming data pipelines (Airflow, Kafka, Spark)
+- Model data in dbt for analytics and ML teams
+- Own data quality, observability and SLAs for critical datasets
+- Mentor engineers and set standards for the data platform
+
+What we're looking for
+- 5+ years in data engineering
+- Strong Python and SQL; experience with a cloud warehouse (BigQuery, Snowflake or Redshift)
+- Production experience with Airflow or similar orchestrators
+- Experience with streaming (Kafka, Kinesis) is a strong plus
+- dbt experience preferred
