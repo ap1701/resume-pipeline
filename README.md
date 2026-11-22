@@ -34,13 +34,33 @@ The writer and the recruiter take turns until the recruiter would forward the re
  resume_final.docx · resume_final.md · REPORT.md · every draft and review
 ```
 
+## Three ways to run it
+
+| | Needs | Live web research | Best for |
+|---|---|---|---|
+| **1. Web app** at https://claude.ai/artifact/PoefDD886un5wMqiwiKU5M (source: `webapp/index.html`) | Any Claude plan (Free, Pro, Max). No API key, no install. | No. Uses Claude's own knowledge plus notes you paste in. | Quick tailoring from a browser or phone |
+| **2. Claude Code: `/tailor-resume`** | Claude Pro or Max. Runs at claude.ai/code, in the desktop app or in the CLI. No API key. | Yes, through Claude Code's web search | The full pipeline at no extra cost |
+| **3. Python CLI** (`python -m resume_pipeline`) | An Anthropic API key (paid per use) | Yes | Automation and batch runs |
+
+### Option 1: the web app
+Open the link while signed in to claude.ai. You can upload your resume as a PDF, Word or text file, or paste it in. Then paste the job description and press **Tailor my resume**. The first time, choose **Allow** when it asks to use Claude; runs count against your plan's usage. You can download the result as .docx or .md, and copy or download the LaTeX.
+
+### Option 2: Claude Code (Pro plan, no API key)
+1. Go to https://claude.ai/code and start a session on the `resume-pipeline` repository. You can also use `claude` in a terminal inside the cloned repo.
+2. Upload or commit your resume, for example `my_resume.pdf`.
+3. Run:
+   ```
+   /tailor-resume my_resume.pdf https://company.com/jobs/123 "Acme" "Senior Data Engineer" --latex
+   ```
+Claude Code runs the `resume-researcher`, `resume-writer` and `senior-recruiter` subagents (defined in `.claude/agents/`) and writes everything to `output/`.
+
 ## How it keeps the resume honest and human
 
 - **No fabrication.** The writer can only reword, reorder and cut what is already in your resume. Skills the strategist marks as `missing` go into a "skills to build" list and never into the resume. The recruiter checks every claim against your original resume and quotes anything it can't trace. A draft with any fabrication flag can't be chosen as the final version.
 - **No obvious AI voice.** The writer works under explicit style rules: specific nouns, varied bullet structures, no stock buzzwords, no em dashes, and as much of your own phrasing as possible. A deterministic linter checks every draft for buzzwords, repeated opening verbs and formulaic "resulting in X%" bullets. Its findings go to both the recruiter and the writer.
 - **Numbers aren't invented.** If a bullet would be stronger with a metric you didn't give, the writer adds a question to "Check these before you send" in `REPORT.md` instead of making one up.
 
-## Setup
+## Option 3 setup: Python CLI with an API key
 
 ```bash
 cd resume-pipeline
